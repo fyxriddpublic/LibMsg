@@ -1,4 +1,5 @@
 ﻿name: LibMsg
 main: com.fyxridd.lib.msg.MsgPlugin
 version: 0.1.0
-depend: [LibCore, ProtocolLib, PacketWrapper]
+depend: [ProtocolLib, PacketWrapper, LibCore, LibFunc, LibChatShow, LibInfo]
+softdepend: [LibParams]

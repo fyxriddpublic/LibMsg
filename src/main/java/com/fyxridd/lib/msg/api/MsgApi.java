@@ -2,6 +2,8 @@ package com.fyxridd.lib.msg.api;
 
 import org.bukkit.entity.Player;
 
+import com.fyxridd.lib.msg.MsgPlugin;
+
 public class MsgApi {
     /**
      * 注册前后缀
@@ -9,7 +11,7 @@ public class MsgApi {
      * @param prefix true表示显示在前缀;false表示显示在后缀
      */
     public static void registerLevel(String type, boolean prefix) {
-        MsgMain.msgManager.registerLevel(type, prefix);
+        MsgPlugin.instance.getMsgManager().registerLevel(type, prefix);
     }
 
     /**
@@ -19,7 +21,7 @@ public class MsgApi {
      * @return 前后缀,可为null
      */
     public static String getLevel(String name, String type) {
-        return MsgMain.msgManager.getLevel(name, type);
+        return MsgPlugin.instance.getMsgManager().getLevel(name, type);
     }
 
     /**
@@ -29,7 +31,7 @@ public class MsgApi {
      * @param level 前后缀,最长16字符,超过会被截断,null或""表示删除
      */
     public static void setLevel(String name, String type, String level) {
-        MsgMain.msgManager.setLevel(name, type, level);
+        MsgPlugin.instance.getMsgManager().setLevel(name, type, level);
     }
 
     /**
@@ -39,7 +41,7 @@ public class MsgApi {
      * @return 当前显示的类型,可为null
      */
     public static String getNowType(String name, boolean prefix) {
-        return MsgMain.msgManager.getNowType(name, prefix);
+        return MsgPlugin.instance.getMsgManager().getNowType(name, prefix);
     }
 
     /**
@@ -48,7 +50,7 @@ public class MsgApi {
      * @return 前缀,不存在或异常返回null或""
      */
     public static String getPrefix(String name) {
-        return MsgMain.getPrefix(name);
+        return MsgPlugin.instance.getScoreboardManager().getPrefix(name);
     }
 
     /**
@@ -57,7 +59,7 @@ public class MsgApi {
      * @return 后缀,不存在或异常返回null或""
      */
     public static String getSuffix(String name) {
-        return MsgMain.getSuffix(name);
+        return MsgPlugin.instance.getScoreboardManager().getSuffix(name);
     }
 
     /**
@@ -66,7 +68,7 @@ public class MsgApi {
      * @return 是否显示侧边栏
      */
     public static boolean isDisplaySideBar(Player p) {
-        return MsgMain.isDisplaySideBar(p);
+        return MsgPlugin.instance.getScoreboardManager().isDisplaySideBar(p);
     }
 
     /**
@@ -75,7 +77,7 @@ public class MsgApi {
      * @param display 是否显示
      */
     public static void setDisplaySideBar(Player p, boolean display) {
-        MsgMain.setDisplaySideBar(p, display);
+        MsgPlugin.instance.getScoreboardManager().setDisplaySideBar(p, display);
     }
 
     /**
@@ -84,7 +86,7 @@ public class MsgApi {
      * @param sideHandler 值获取器
      */
     public static void registerSideHandler(String name, SideHandler sideHandler) {
-        MsgMain.registerSideHandler(name, sideHandler);
+        MsgPlugin.instance.getScoreboardManager().registerSideHandler(name, sideHandler);
     }
 
     /**
@@ -92,6 +94,6 @@ public class MsgApi {
      * @param name 获取器名,唯一
      */
     public static void updateSideShow(Player p, String name) {
-        MsgMain.updateSideShow(p, name);
+        MsgPlugin.instance.getScoreboardManager().updateSideShow(p, name);
     }
 }

@@ -1,0 +1,62 @@
+﻿pageMax: 1
+
+listSize: 0
+
+refresh: true
+
+page-1: "5 8 10 15 20 3 25 3"
+
+show-3: ""
+
+show-5: "&7======================[&a前后缀&7]====================="
+
+show-8: "      &7+-----------+&3  当前显示  &7+-----------+"
+    
+show-10: "               &a前缀: <0><1>  <2>"
+info-10:
+  0:
+    con: "y'{prefix}'!=''"
+    text: "{prefix}"
+    color: "f"
+  1:
+    con: "y'{prefix}'==''"
+    text: "无"
+    color: "7"
+  2:
+    con: "y'{prefix}'!=''"
+    text: "✖"
+    color: "c"
+    onClick: "cmd /f mg e"
+    onHover: "&7点击取消显示前缀"
+    
+show-15: "               &a后缀: <0><1>  <2>"
+info-15:
+  0:
+    con: "y'{suffix}'!=''"
+    text: "{suffix}"
+    color: "f"
+  1:
+    con: "y'{suffix}'==''"
+    text: "无"
+    color: "7"
+  2:
+    con: "y'{suffix}'!=''"
+    text: "✖"
+    color: "c"
+    onClick: "cmd /f mg f"
+    onHover: "&7点击取消显示后缀"
+    
+show-20: "        &7+-----------+&3  操作  &7+-----------+"
+    
+show-25: "           <0>        <1>"
+info-25:
+  0:
+    text: "[前缀列表]"
+    color: "6"
+    onClick: "cmd /f mg b"
+    onHover: "&7点击查看前缀列表"
+  1:
+    text: "[后缀列表]"
+    color: "6"
+    onClick: "cmd /f mg c"
+    onHover: "&7点击查看后缀列表"

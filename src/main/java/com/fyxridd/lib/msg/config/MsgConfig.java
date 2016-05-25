@@ -40,9 +40,6 @@ public class MsgConfig {
     @ConfigConvert(LangConverter.class)
     private LangGetter lang;
 
-    @Path("adminPer")
-    private String adminPer;
-    
     @Path("prefix.per")
     private String prefixPer;
     @Path("prefix.auto")
@@ -64,10 +61,6 @@ public class MsgConfig {
     
     public LangGetter getLang() {
         return lang;
-    }
-
-    public String getAdminPer() {
-        return adminPer;
     }
 
     public String getPrefixPer() {

@@ -83,10 +83,10 @@ public class MsgApi {
     /**
      * 注册侧边栏值获取器
      * @param name 获取器名,唯一
-     * @param sideHandler 值获取器
+     * @param sideGetter 值获取器
      */
-    public static void registerSideHandler(String name, SideHandler sideHandler) {
-        MsgPlugin.instance.getScoreboardManager().registerSideHandler(name, sideHandler);
+    public static void registerSideHandler(String name, SideGetter sideGetter) {
+        MsgPlugin.instance.getScoreboardManager().registerSideHandler(name, sideGetter);
     }
 
     /**

@@ -3,7 +3,7 @@ package com.fyxridd.lib.msg.manager;
 import com.fyxridd.lib.core.api.UtilApi;
 import com.fyxridd.lib.msg.MsgPlugin;
 import com.fyxridd.lib.msg.api.MsgApi;
-import com.fyxridd.lib.msg.api.SideHandler;
+import com.fyxridd.lib.msg.api.SideGetter;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -23,7 +23,7 @@ public class InfoManager {
 
     public InfoManager() {
         //注册获取器
-        MsgApi.registerSideHandler(HANDLER_NAME, new SideHandler() {
+        MsgApi.registerSideHandler(HANDLER_NAME, new SideGetter() {
             /**
              * data会转换颜色字符,可用变量:
              *   {name}: 玩家名

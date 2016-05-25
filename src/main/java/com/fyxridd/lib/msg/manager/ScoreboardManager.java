@@ -10,24 +10,24 @@ import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.fyxridd.lib.core.api.PerApi;
 import com.fyxridd.lib.core.api.PlayerApi;
+import com.fyxridd.lib.core.api.config.ConfigApi;
+import com.fyxridd.lib.core.api.config.Setter;
 import com.fyxridd.lib.core.realname.NotReadyException;
-import com.fyxridd.lib.msg.api.SideHandler;
+import com.fyxridd.lib.msg.MsgPlugin;
+import com.fyxridd.lib.msg.api.SideGetter;
 import com.fyxridd.lib.msg.config.MsgConfig;
 import com.fyxridd.lib.msg.model.MsgInfo;
 import com.fyxridd.lib.msg.model.SideConfig;
 import com.fyxridd.lib.msg.model.SideInfo;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
+import org.bukkit.event.*;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.plugin.EventExecutor;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ScoreboardManager {
     private static final String colors = "abcdef0123456789";
@@ -40,53 +40,68 @@ public class ScoreboardManager {
     //缓存
 
     //玩家名,前后缀信息
-    private static HashMap<String, MsgInfo> msgInfoHash = new HashMap<>();
+    private static Map<String, MsgInfo> msgInfos = new HashMap<>();
     //玩家名,队伍的只包含自己的信息
-    private static HashMap<String, List<String>> playersHash = new HashMap<>();
+    private static Map<String, List<String>> players = new HashMap<>();
 
     //玩家名,侧边栏信息
-    private static HashMap<String, SideInfo> showHash = new HashMap<>();
+    private static Map<String, SideInfo> shows = new HashMap<>();
     //侧边栏获取器名 侧边栏获取器
-    private static HashMap<String, SideHandler> sideHandlers = new HashMap<>();
+    private static Map<String, SideGetter> sideGetters = new HashMap<>();
 
     public ScoreboardManager() {
-    }
+        //添加配置监听
+        ConfigApi.addListener(MsgPlugin.instance.pn, MsgConfig.class, new Setter<MsgConfig>() {
+            @Override
+            public void set(MsgConfig value) {
+                config = value;
+            }
+        });
+        //注册事件
+        {
+            //玩家加入
+            Bukkit.getPluginManager().registerEvent(PlayerJoinEvent.class, MsgPlugin.instance, EventPriority.LOWEST, new EventExecutor() {
+                @Override
+                public void execute(Listener listener, Event e) throws EventException {
+                    PlayerJoinEvent event = (PlayerJoinEvent) e;
+                    Player p = event.getPlayer();
+                    String name = p.getName();
+                    if (!players.containsKey(name)) {
+                        List<String> list = new ArrayList<String>();
+                        list.add(name);
+                        players.put(name, list);
+                    }
 
-    @EventHandler(priority=EventPriority.LOWEST)
-    public void onPlayerJoin(PlayerJoinEvent e) {
-        Player p = e.getPlayer();
-        String name = p.getName();
-        if (!playersHash.containsKey(name)) {
-            List<String> list = new ArrayList<>();
-            list.add(name);
-            playersHash.put(name, list);
-        }
+                    MsgInfo msgInfo0 = getMsgInfo(p.getName());
+                    List<String> list0 = players.get(name);
+                    PacketContainer createTeamPacketSelf = getCreateTeamPacket(name, msgInfo0.getPrefix(), msgInfo0.getSuffix(), list0);;
+                    for (Player tar:Bukkit.getOnlinePlayers()) {
+                        if (!tar.equals(p)) send(tar, createTeamPacketSelf);
 
-        MsgInfo msgInfo0 = getMsgInfo(p.getName());
-        List<String> list0 = playersHash.get(name);
-        PacketContainer createTeamPacketSelf = getCreateTeamPacket(name, msgInfo0.getPrefix(), msgInfo0.getSuffix(), list0);;
-        for (Player tar:Bukkit.getOnlinePlayers()) {
-            if (!tar.equals(p)) send(tar, createTeamPacketSelf);
-
-            MsgInfo msgInfo = getMsgInfo(tar.getName());
-            List<String> list = playersHash.get(tar.getName());
-            PacketContainer createTeamPacketOther = getCreateTeamPacket(tar.getName(), msgInfo.getPrefix(), msgInfo.getSuffix(), list);
-            send(p, createTeamPacketOther);
-        }
-        //侧边栏检测
-        if (isDisplaySideBar(p)) {
-            SideInfo sideInfo = getShowInfo(name);
-            List<PacketContainer> createSidePackets = getCreateSidePackets(name, sideInfo.getShow(), sideInfo.getFrom());
-            for (PacketContainer pc : createSidePackets) send(p, pc);
-        }
-    }
-
-    @EventHandler(priority=EventPriority.LOWEST)
-    public void onPlayerQuit(PlayerQuitEvent e) {
-        Player p = e.getPlayer();
-        PacketContainer pc = getRemoveTeamPacket(p.getName());
-        for (Player tar:Bukkit.getOnlinePlayers()) {
-            if (!tar.getName().equals(p.getName())) send(tar, pc);
+                        MsgInfo msgInfo = getMsgInfo(tar.getName());
+                        PacketContainer createTeamPacketOther = getCreateTeamPacket(tar.getName(), msgInfo.getPrefix(), msgInfo.getSuffix(), players.get(tar.getName()));
+                        send(p, createTeamPacketOther);
+                    }
+                    //侧边栏检测
+                    if (isDisplaySideBar(p)) {
+                        SideInfo sideInfo = getShowInfo(name);
+                        List<PacketContainer> createSidePackets = getCreateSidePackets(name, sideInfo.getShow(), sideInfo.getFrom());
+                        for (PacketContainer pc : createSidePackets) send(p, pc);
+                    }
+                }
+            }, MsgPlugin.instance);
+            //玩家退出
+            Bukkit.getPluginManager().registerEvent(PlayerQuitEvent.class, MsgPlugin.instance, EventPriority.LOWEST, new EventExecutor() {
+                @Override
+                public void execute(Listener listener, Event e) throws EventException {
+                    PlayerQuitEvent event = (PlayerQuitEvent) e;
+                    Player p = event.getPlayer();
+                    PacketContainer pc = getRemoveTeamPacket(p.getName());
+                    for (Player tar:Bukkit.getOnlinePlayers()) {
+                        if (!tar.getName().equals(p.getName())) send(tar, pc);
+                    }
+                }
+            }, MsgPlugin.instance);
         }
     }
 
@@ -236,21 +251,21 @@ public class ScoreboardManager {
     }
 
     /**
-     * @see com.fyxridd.lib.msg.api.MsgApi#registerSideHandler(String, com.fyxridd.lib.msg.api.SideHandler)
+     * @see com.fyxridd.lib.msg.api.MsgApi#registerSideHandler(String, SideGetter)
      */
-    public void registerSideHandler(String name, SideHandler sideHandler) {
-        sideHandlers.put(name, sideHandler);
+    public void registerSideHandler(String name, SideGetter sideGetter) {
+        sideGetters.put(name, sideGetter);
     }
 
     /**
      * @see com.fyxridd.lib.msg.api.MsgApi#updateSideShow(org.bukkit.entity.Player, String)
      */
     public void updateSideShow(Player p, String name) {
-        SideHandler sideHandler = sideHandlers.get(name);
-        if (sideHandler != null) {
+        SideGetter sideGetter = sideGetters.get(name);
+        if (sideGetter != null) {
             for (Map.Entry<Integer, SideConfig> entry:config.getSides().entrySet()) {
                 if (entry.getValue().getName().equals(name)) {
-                    String content = sideHandler.get(p, entry.getValue().getData());
+                    String content = sideGetter.get(p, entry.getValue().getData());
                     if (entry.getKey() == -1) setSideShowTitle(p, content);
                     else setSideShowItem(p, entry.getKey(), content);
                 }
@@ -265,7 +280,7 @@ public class ScoreboardManager {
      * @param suffix 可为null
      * @param players 可为null
      */
-    private static PacketContainer getCreateTeamPacket(String name, String prefix, String suffix, List<String> players) {
+    private PacketContainer getCreateTeamPacket(String name, String prefix, String suffix, List<String> players) {
         if (prefix == null) prefix = "";
         if (suffix == null) suffix = "";
         if (players == null) players = new ArrayList<>();
@@ -285,7 +300,7 @@ public class ScoreboardManager {
      * @param prefix 可为null
      * @param suffix 可为null
      */
-    private static PacketContainer getUpdateTeamInfoPacket(String name, String prefix, String suffix) {
+    private PacketContainer getUpdateTeamInfoPacket(String name, String prefix, String suffix) {
         if (prefix == null) prefix = "";
         if (suffix == null) suffix = "";
 
@@ -301,7 +316,7 @@ public class ScoreboardManager {
      * 获取去除队伍信息包
      * @param name 不为null
      */
-    private static PacketContainer getRemoveTeamPacket(String name) {
+    private PacketContainer getRemoveTeamPacket(String name) {
         WrapperPlayServerScoreboardTeam team = new WrapperPlayServerScoreboardTeam();
         team.setTeamName(name);
         team.setMode(1);
@@ -314,7 +329,7 @@ public class ScoreboardManager {
      * @param show 显示的信息(如果超过32字符会自动截取前32字符),可为null
      * @param froms 发出者s,可为null
      */
-    private static List<PacketContainer> getCreateSidePackets(String name, String show, List<String> froms) {
+    private List<PacketContainer> getCreateSidePackets(String name, String show, List<String> froms) {
         List<PacketContainer> result = new ArrayList<>();
         if (show == null) show = "";
         show = show.substring(0, Math.min(32, show.length()));
@@ -350,7 +365,7 @@ public class ScoreboardManager {
      * @param name 玩家名(用作objective的唯一标识),不为null
      * @param show 显示的标题(如果超过32字符会自动截取前32字符),可为null
      */
-    private static PacketContainer getUpdateSideTitlePacket(String name, String show) {
+    private PacketContainer getUpdateSideTitlePacket(String name, String show) {
         if (show == null) show = "";
 
         WrapperPlayServerScoreboardObjective obj = new WrapperPlayServerScoreboardObjective();
@@ -367,7 +382,7 @@ public class ScoreboardManager {
      * @param index 位置,从下往上排,0-(sideSize-1)
      * @param from 发出者,最长14字符,可为null
      */
-    private static PacketContainer getUpdateSideItemPacket(String name, int index, String from) {
+    private PacketContainer getUpdateSideItemPacket(String name, int index, String from) {
         if (from == null) from = "";
         from = from.substring(0, Math.min(14, from.length()));
         from += getEnd(index);
@@ -386,7 +401,7 @@ public class ScoreboardManager {
      * @param index 位置,从下往上排,0-(sideSize-1)
      * @param from 发出者,最长14字符,可为null
      */
-    private static PacketContainer getRemoveSideItemPacket(String name, int index, String from) {
+    private PacketContainer getRemoveSideItemPacket(String name, int index, String from) {
         if (from == null) from = "";
         from = from.substring(0, Math.min(14, from.length()));
         from += getEnd(index);
@@ -403,7 +418,7 @@ public class ScoreboardManager {
      * 获取去除侧边栏显示包
      * @param name 玩家名(用作objective的唯一标识),不为null
      */
-    private static PacketContainer getRemoveSidePacket(String name) {
+    private PacketContainer getRemoveSidePacket(String name) {
         WrapperPlayServerScoreboardObjective obj = new WrapperPlayServerScoreboardObjective();
         obj.setMode(1);
         obj.setObjectiveName(name);
@@ -415,7 +430,7 @@ public class ScoreboardManager {
      * @param p 玩家
      * @param pc 包
      */
-    private static void send(Player p, PacketContainer pc) {
+    private void send(Player p, PacketContainer pc) {
         try {
             protocolManager.sendServerPacket(p, pc);
         } catch (InvocationTargetException e) {
@@ -427,11 +442,11 @@ public class ScoreboardManager {
      * 获取玩家的信息
      * @param name 玩家名,不为null
      */
-    private static MsgInfo getMsgInfo(String name) {
-        MsgInfo msgInfo = msgInfoHash.get(name);
+    private MsgInfo getMsgInfo(String name) {
+        MsgInfo msgInfo = msgInfos.get(name);
         if (msgInfo == null) {
             msgInfo = new MsgInfo(null, null);
-            msgInfoHash.put(name, msgInfo);
+            msgInfos.put(name, msgInfo);
         }
         return msgInfo;
     }
@@ -441,13 +456,13 @@ public class ScoreboardManager {
      * @param name 玩家名,不为null
      */
     private SideInfo getShowInfo(String name) {
-        SideInfo sideInfo = showHash.get(name);
+        SideInfo sideInfo = shows.get(name);
         if (sideInfo == null) {
             List<String> froms = new ArrayList<>();
             for (int i=0;i<config.getSideSize();i++) froms.add("");
 
             sideInfo = new SideInfo("", froms);
-            showHash.put(name, sideInfo);
+            shows.put(name, sideInfo);
         }
         return sideInfo;
     }
@@ -456,7 +471,7 @@ public class ScoreboardManager {
      * 获取唯一的颜色结尾(两个字符),用来防止内容相同
      * @param index 位置,0-(sideSize-1)
      */
-    private static String getEnd(int index) {
+    private String getEnd(int index) {
         index = index%colors.length();
         char c = colors.charAt(index);
         return "\u00A7"+c;

@@ -7,22 +7,22 @@ import com.fyxridd.lib.info.api.InfoApi;
 import com.fyxridd.lib.msg.MsgPlugin;
 import com.fyxridd.lib.msg.config.MsgConfig;
 import com.fyxridd.lib.msg.func.MsgChat;
+import com.fyxridd.lib.msg.func.MsgCmd;
 import com.fyxridd.lib.msg.model.LevelData;
 import com.fyxridd.lib.msg.model.LevelInfo;
 
 import org.bukkit.Bukkit;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
+import org.bukkit.event.*;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.plugin.EventExecutor;
 
 import java.util.*;
 
 /**
  * 前后缀的中间层
  */
-public class MsgManager implements Listener {
+public class MsgManager {
     //LibInfo的键
     private static final String PRE_SHOW_PREFIX = "PreShowPrefix";
     private static final String PRE_SHOW_SUFFIX = "PreShowSuffix";
@@ -32,16 +32,16 @@ public class MsgManager implements Listener {
     //缓存
 
     //称号类型 称号信息
-    private HashMap<String, LevelInfo> infos = new HashMap<>();
+    private Map<String, LevelInfo> infos = new HashMap<>();
 
     //玩家名 称号类型 称号信息(内的level不为null)
-    private HashMap<String, HashMap<String, LevelData>> prefixLevels = new HashMap<>(), suffixLevels = new HashMap<>();
+    private Map<String, Map<String, LevelData>> prefixLevels = new HashMap<>(), suffixLevels = new HashMap<>();
 
     //玩家名 当前显示的称号类型,不为null
-    private HashMap<String, String> nowPrefix = new HashMap<>(), nowSuffix = new HashMap<>();
+    private Map<String, String> nowPrefix = new HashMap<>(), nowSuffix = new HashMap<>();
 
     //允许自动选择的玩家列表
-    private HashSet<String> enableAutos = new HashSet<>();
+    private Set<String> enableAutos = new HashSet<>();
 
     public MsgManager() {
         //添加配置监听
@@ -52,59 +52,70 @@ public class MsgManager implements Listener {
             }
         });
         //注册功能
+        FuncApi.register(MsgPlugin.instance.pn, new MsgCmd());
         FuncApi.register(MsgPlugin.instance.pn, new MsgChat());
-        
-        Bukkit.getPluginManager().registerEvents(this, MsgPlugin.instance);
-    }
 
-    @EventHandler(priority= EventPriority.LOWEST)
-    public void onPlayerJoinLowest(PlayerJoinEvent e) {
-        if (!prefixLevels.containsKey(e.getPlayer().getName())) prefixLevels.put(e.getPlayer().getName(), new HashMap<String, LevelData>());
-        if (!suffixLevels.containsKey(e.getPlayer().getName())) suffixLevels.put(e.getPlayer().getName(), new HashMap<String, LevelData>());
-    }
-
-    @EventHandler(priority= EventPriority.MONITOR)
-    public void onPlayerJoin(PlayerJoinEvent e) {
-        String name = e.getPlayer().getName();
-        enableAutos.add(name);
-        //前缀
+        //注册事件
         {
-            HashMap<String, LevelData> datas = prefixLevels.get(name);
-            if (datas != null) {
-                //检测先前显示的
-                LevelData levelData = datas.get(InfoApi.getInfo(name, PRE_SHOW_PREFIX));
-                if (levelData != null && isPrefix(levelData.getType())) {
-                    setLevel(name, levelData.getType(), levelData.getLevel(), true, true);
-                }else {
-                    //删除当前显示
-                    setLevel(name, null, null, true, true);
-                    //检测自动选择一个
-                    checkAutoSel(name, true);
+            //玩家加入
+            Bukkit.getPluginManager().registerEvent(PlayerJoinEvent.class, MsgPlugin.instance, EventPriority.LOWEST, new EventExecutor() {
+                @Override
+                public void execute(Listener listener, Event e) throws EventException {
+                    PlayerJoinEvent event = (PlayerJoinEvent) e;
+                    if (!prefixLevels.containsKey(event.getPlayer().getName())) prefixLevels.put(event.getPlayer().getName(), new HashMap<String, LevelData>());
+                    if (!suffixLevels.containsKey(event.getPlayer().getName())) suffixLevels.put(event.getPlayer().getName(), new HashMap<String, LevelData>());
                 }
-            }
-        }
+            }, MsgPlugin.instance);
+            Bukkit.getPluginManager().registerEvent(PlayerJoinEvent.class, MsgPlugin.instance, EventPriority.MONITOR, new EventExecutor() {
+                @Override
+                public void execute(Listener listener, Event e) throws EventException {
+                    PlayerJoinEvent event = (PlayerJoinEvent) e;
+                    String name = event.getPlayer().getName();
+                    enableAutos.add(name);
+                    //前缀
+                    {
+                        Map<String, LevelData> datas = prefixLevels.get(name);
+                        if (datas != null) {
+                            //检测先前显示的
+                            LevelData levelData = datas.get(InfoApi.getInfo(name, PRE_SHOW_PREFIX));
+                            if (levelData != null && isPrefix(levelData.getType())) {
+                                setLevel(name, levelData.getType(), levelData.getLevel(), true, true);
+                            }else {
+                                //删除当前显示
+                                setLevel(name, null, null, true, true);
+                                //检测自动选择一个
+                                checkAutoSel(name, true);
+                            }
+                        }
+                    }
 
-        //后缀
-        {
-            HashMap<String, LevelData> datas = suffixLevels.get(name);
-            if (datas != null) {
-                //检测先前显示的
-                LevelData levelData = datas.get(InfoApi.getInfo(name, PRE_SHOW_SUFFIX));
-                if (levelData != null && !isPrefix(levelData.getType())) {
-                    setLevel(name, levelData.getType(), levelData.getLevel(), false, true);
-                }else {
-                    //删除当前显示
-                    setLevel(name, null, null, false, true);
-                    //检测自动选择一个
-                    checkAutoSel(name, false);
+                    //后缀
+                    {
+                        Map<String, LevelData> datas = suffixLevels.get(name);
+                        if (datas != null) {
+                            //检测先前显示的
+                            LevelData levelData = datas.get(InfoApi.getInfo(name, PRE_SHOW_SUFFIX));
+                            if (levelData != null && !isPrefix(levelData.getType())) {
+                                setLevel(name, levelData.getType(), levelData.getLevel(), false, true);
+                            }else {
+                                //删除当前显示
+                                setLevel(name, null, null, false, true);
+                                //检测自动选择一个
+                                checkAutoSel(name, false);
+                            }
+                        }
+                    }
                 }
-            }
+            }, MsgPlugin.instance);
+            //玩家退出
+            Bukkit.getPluginManager().registerEvent(PlayerQuitEvent.class, MsgPlugin.instance, EventPriority.NORMAL, new EventExecutor() {
+                @Override
+                public void execute(Listener listener, Event e) throws EventException {
+                    PlayerQuitEvent event = (PlayerQuitEvent) e;
+                    enableAutos.remove(event.getPlayer().getName());
+                }
+            }, MsgPlugin.instance);
         }
-    }
-
-    @EventHandler(priority= EventPriority.NORMAL)
-    public void onPlayerQuit(PlayerQuitEvent e) {
-        enableAutos.remove(e.getPlayer().getName());
     }
 
     /**
@@ -118,7 +129,7 @@ public class MsgManager implements Listener {
      * @see com.fyxridd.lib.msg.api.MsgApi#getLevel(String, String)
      */
     public String getLevel(String name, String type) {
-        HashMap<String, LevelData> datas = isPrefix(type)?prefixLevels.get(name):suffixLevels.get(name);
+        Map<String, LevelData> datas = isPrefix(type)?prefixLevels.get(name):suffixLevels.get(name);
         if (datas != null) {
             LevelData levelData = datas.get(type);
             if (levelData != null) return levelData.getLevel();
@@ -132,7 +143,7 @@ public class MsgManager implements Listener {
     public void setLevel(String name, String type, String level) {
         boolean isPrefix = isPrefix(type);
         //初始化
-        HashMap<String, LevelData> datas = isPrefix?prefixLevels.get(name):suffixLevels.get(name);
+        Map<String, LevelData> datas = isPrefix?prefixLevels.get(name):suffixLevels.get(name);
         if (datas == null) {
             datas = new HashMap<>();
             if (isPrefix) prefixLevels.put(name, datas);
@@ -172,10 +183,6 @@ public class MsgManager implements Listener {
         return nowSuffix.get(name);
     }
 
-    public Collection<LevelInfo> getLevelInfos() {
-        return infos.values();
-    }
-
     public Collection<LevelData> getPrefixs(String name) {
         return prefixLevels.get(name).values();
     }
@@ -199,10 +206,10 @@ public class MsgManager implements Listener {
      */
     public void checkAutoSel(String name, boolean prefix) {
         if ((prefix && config.isPrefixAuto() && getNowType(name, true) == null) || (!prefix && config.isSuffixAuto() && getNowType(name, false) == null)) {
-            HashMap<String, LevelData> datas = prefix?prefixLevels.get(name):suffixLevels.get(name);
+            Map<String, LevelData> datas = prefix?prefixLevels.get(name):suffixLevels.get(name);
             if (datas != null) {
                 for (LevelData levelData:datas.values()) {
-                    if (!(prefix ^ isPrefix(levelData.getType()))) {
+                    if (prefix == isPrefix(levelData.getType())) {
                         setLevel(name, levelData.getType(), levelData.getLevel(), prefix, true);
                         break;
                     }

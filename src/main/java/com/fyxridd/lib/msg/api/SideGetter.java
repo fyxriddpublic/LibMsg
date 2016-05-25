@@ -5,7 +5,7 @@ import org.bukkit.entity.Player;
 /**
  * 侧边栏值获取器
  */
-public interface SideHandler {
+public interface SideGetter {
     /**
      * 获取值
      * @param p 玩家

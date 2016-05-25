@@ -1,6 +1,14 @@
-﻿pageMax: 1
+﻿params:
+  getObjects:
+    o1: "LibMsg:getPlayerInfo({name})"
+  getStrings:
+    a_prefixType: "o1:getPrefixType()"
 
-listSize: 8
+list:
+  plugin: "LibMsg"
+  key: "getLevelData"
+  arg: ""
+  size: 8
 
 refresh: true
 

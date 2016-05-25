@@ -1,4 +1,10 @@
-﻿pageMax: 1
+﻿params:
+  getObjects:
+    o1: "LibMsg:getPlayerInfo({name})"
+  getStrings:
+    a_suffixType: "o1:getSuffixType()"
+
+pageMax: 1
 
 listSize: 8
 

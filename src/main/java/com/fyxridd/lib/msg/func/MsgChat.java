@@ -3,11 +3,9 @@ package com.fyxridd.lib.msg.func;
 import com.fyxridd.lib.func.api.func.Func;
 import com.fyxridd.lib.func.api.func.FuncType;
 import com.fyxridd.lib.msg.MsgPlugin;
-import com.fyxridd.lib.msg.model.LevelData;
 import com.fyxridd.lib.show.chat.api.ShowApi;
 import com.fyxridd.lib.show.chat.api.show.PlayerContext;
 import com.fyxridd.lib.show.chat.api.show.Refresh;
-import com.fyxridd.lib.show.chat.api.show.ShowList;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -42,24 +40,18 @@ public class MsgChat implements Refresh{
     }
 
     public void showMain(Player p, PlayerContext pc) {
-        if (pc != null) ShowApi.show(this, "main", p, MsgPlugin.instance.pn, PAGE_MAIN, null, pc.getPageNow(), pc.getListNow(), null, null);
-        else ShowApi.show(this, "main", p, MsgPlugin.instance.pn, PAGE_MAIN, null, 1, 1, null, null);
+        if (pc != null) ShowApi.show(this, "main", p, MsgPlugin.instance.pn, PAGE_MAIN, pc.getPageNow(), pc.getListNow(), null, null);
+        else ShowApi.show(this, "main", p, MsgPlugin.instance.pn, PAGE_MAIN, 1, 1, null, null);
     }
 
     private void showPrefix(Player p, PlayerContext pc) {
-        //list
-        ShowList showList = ShowApi.getShowList(2, MsgPlugin.instance.getMsgManager().getPrefixs(p.getName()), LevelData.class);
-        //显示
-        if (pc != null) ShowApi.show(this, "prefix", p, MsgPlugin.instance.pn, PAGE_PREFIX, showList, pc.getPageNow(), pc.getListNow(), null, null);
-        else ShowApi.show(this, "prefix", p, MsgPlugin.instance.pn, PAGE_PREFIX, showList, 1, 1, null, null);
+        if (pc != null) ShowApi.show(this, "prefix", p, MsgPlugin.instance.pn, PAGE_PREFIX, pc.getPageNow(), pc.getListNow(), null, null);
+        else ShowApi.show(this, "prefix", p, MsgPlugin.instance.pn, PAGE_PREFIX, 1, 1, null, null);
     }
 
     private void showSuffix(Player p, PlayerContext pc) {
-        //list
-        ShowList showList = ShowApi.getShowList(2, MsgPlugin.instance.getMsgManager().getSuffixs(p.getName()), LevelData.class);
-        //显示
-        if (pc != null) ShowApi.show(this, "suffix", p, MsgPlugin.instance.pn, PAGE_SUFFIX, showList, pc.getPageNow(), pc.getListNow(), null, null);
-        else ShowApi.show(this, "suffix", p, MsgPlugin.instance.pn, PAGE_SUFFIX, showList, 1, 1, null, null);
+        if (pc != null) ShowApi.show(this, "suffix", p, MsgPlugin.instance.pn, PAGE_SUFFIX, pc.getPageNow(), pc.getListNow(), null, null);
+        else ShowApi.show(this, "suffix", p, MsgPlugin.instance.pn, PAGE_SUFFIX, 1, 1, null, null);
     }
 
     @Override

@@ -5,7 +5,7 @@ import com.fyxridd.lib.core.api.plugin.SimplePlugin;
 import com.fyxridd.lib.msg.config.MsgConfig;
 import com.fyxridd.lib.msg.manager.InfoManager;
 import com.fyxridd.lib.msg.manager.MsgManager;
-import com.fyxridd.lib.msg.manager.ParamsManager;
+import com.fyxridd.lib.msg.manager.OuterManager;
 import com.fyxridd.lib.msg.manager.ScoreboardManager;
 
 public class MsgPlugin extends SimplePlugin{
@@ -31,7 +31,7 @@ public class MsgPlugin extends SimplePlugin{
         msgManager = new MsgManager();
         scoreboardManager = new ScoreboardManager();
         infoManager = new InfoManager();
-        if (libParamsHook) new ParamsManager();
+        if (libParamsHook) new OuterManager();
         
         super.onEnable();
     }

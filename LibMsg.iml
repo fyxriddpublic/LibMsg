@@ -21,5 +21,10 @@
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.commons:commons-math3:3.5" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.mybatis:mybatis:3.2.7" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: mysql:mysql-connector-java:5.1.38" level="project" />
+    <orderEntry type="module" module-name="LibFunc" scope="PROVIDED" />
+    <orderEntry type="module" module-name="LibChatShow" scope="PROVIDED" />
+    <orderEntry type="module" module-name="LibInfo" scope="PROVIDED" />
+    <orderEntry type="module" module-name="LibParams" scope="PROVIDED" />
+    <orderEntry type="module" module-name="LibSpeed" scope="PROVIDED" />
   </component>
 </module>

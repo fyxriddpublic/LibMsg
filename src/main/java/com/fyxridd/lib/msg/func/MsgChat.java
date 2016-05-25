@@ -3,6 +3,9 @@ package com.fyxridd.lib.msg.func;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.fyxridd.lib.core.api.MessageApi;
+import com.fyxridd.lib.core.api.fancymessage.FancyMessage;
+import com.fyxridd.lib.speed.api.SpeedApi;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -67,25 +70,25 @@ public class MsgChat implements Refresh{
         //检测权限
         if (!checkPer(p, type)) return;
         //速度检测
-        if (!SpeedApi.checkShort(p, MsgPlugin.pn, SHORT_SEL, 3)) return;
+        if (!SpeedApi.checkShort(p, MsgPlugin.instance.pn, SHORT_SEL, 3)) return;
         //与当前显示相同
-        boolean isPrefix = ScoreboardManager.msgManager.isPrefix(type);
+        boolean isPrefix = MsgPlugin.instance.getMsgManager().isPrefix(type);
         if (type.equals(MsgApi.getNowType(p.getName(), isPrefix))) {
-            ShowApi.tip(p, get(70), true);
+            MessageApi.send(p, get(p.getName(), 70), true);
             return;
         }
         //无此称号
         String level = MsgApi.getLevel(p.getName(), type);
         if (level == null) {
-            if (isPrefix) ShowApi.tip(p, get(40), true);
-            else ShowApi.tip(p, get(45), true);
+            if (isPrefix) MessageApi.send(p, get(p.getName(), 40), true);
+            else MessageApi.send(p, get(p.getName(), 45), true);
             return;
         }
         //选择显示成功
         ScoreboardManager.msgManager.setLevel(p.getName(), type, level, isPrefix, true);
         //提示
-        if (isPrefix) ShowApi.tip(p, get(50, level), true);
-        else ShowApi.tip(p, get(55, level), true);
+        if (isPrefix) MessageApi.send(p, get(50, level), true);
+        else MessageApi.send(p, get(55, level), true);
     }
 
     @Func("cancel")
@@ -97,8 +100,8 @@ public class MsgChat implements Refresh{
         //取消显示成功
         ScoreboardManager.msgManager.setLevel(p.getName(), null, null, prefix, true);
         //提示
-        if (prefix) ShowApi.tip(p, get(60), true);
-        else ShowApi.tip(p, get(65), true);
+        if (prefix) MessageApi.send(p, get(60), true);
+        else MessageApi.send(p, get(65), true);
     }
 
     public void showMain(Player p, PlayerContext pc) {
@@ -168,5 +171,9 @@ public class MsgChat implements Refresh{
             if (!PerApi.checkPer(p.getName(), config.getSuffixPer())) return false;
         }
         return true;
+    }
+
+    private FancyMessage get(String player, int id, Object... args) {
+        return config.getLang().get(player, id, args);
     }
 }

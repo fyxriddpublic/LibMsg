@@ -20,7 +20,7 @@ import org.bukkit.plugin.EventExecutor;
 import java.util.*;
 
 /**
- * 前后缀的中间层
+ * 负责维护玩家称号列表相关的逻辑
  */
 public class MsgManager {
     //LibInfo的键

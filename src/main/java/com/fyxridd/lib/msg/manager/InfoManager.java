@@ -15,7 +15,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.EventExecutor;
 
 /**
- * 信息获取器
+ * 侧边栏获取器: 信息获取器
  * 此信息是静态的,玩家加入游戏时设置一次,在游戏中不会改变
  */
 public class InfoManager {

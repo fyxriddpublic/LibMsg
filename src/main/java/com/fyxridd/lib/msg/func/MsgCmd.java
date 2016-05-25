@@ -9,22 +9,31 @@ import com.fyxridd.lib.func.api.func.Func;
 import com.fyxridd.lib.func.api.func.FuncType;
 import com.fyxridd.lib.msg.MsgPlugin;
 import com.fyxridd.lib.msg.api.MsgApi;
+import com.fyxridd.lib.msg.config.LangConfig;
 import com.fyxridd.lib.msg.config.MsgConfig;
 import com.fyxridd.lib.speed.api.SpeedApi;
+
 import org.bukkit.entity.Player;
 
 @FuncType("cmd")
 public class MsgCmd{
     private static final String SHORT_SEL = "st_sel";
 
-    private MsgConfig config;
+    private LangConfig langConfig;
+    private MsgConfig msgConfig;
 
     public MsgCmd() {
         //添加配置监听
+        ConfigApi.addListener(MsgPlugin.instance.pn, LangConfig.class, new Setter<LangConfig>() {
+            @Override
+            public void set(LangConfig value) {
+                langConfig = value;
+            }
+        });
         ConfigApi.addListener(MsgPlugin.instance.pn, MsgConfig.class, new Setter<MsgConfig>() {
             @Override
             public void set(MsgConfig value) {
-                config = value;
+                msgConfig = value;
             }
         });
     }
@@ -80,14 +89,14 @@ public class MsgCmd{
      */
     private boolean checkPer(Player p, boolean prefix) {
         if (prefix) {
-            if (!PerApi.checkHasPer(p.getName(), config.getPrefixPer())) return false;
+            if (!PerApi.checkHasPer(p.getName(), msgConfig.getPrefixPer())) return false;
         }else {
-            if (!PerApi.checkHasPer(p.getName(), config.getSuffixPer())) return false;
+            if (!PerApi.checkHasPer(p.getName(), msgConfig.getSuffixPer())) return false;
         }
         return true;
     }
 
     private FancyMessage get(String player, int id, Object... args) {
-        return config.getLang().get(player, id, args);
+        return langConfig.getLang().get(player, id, args);
     }
 }

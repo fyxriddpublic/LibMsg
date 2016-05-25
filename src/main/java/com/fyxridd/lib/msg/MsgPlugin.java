@@ -2,7 +2,9 @@ package com.fyxridd.lib.msg;
 
 import com.fyxridd.lib.core.api.config.ConfigApi;
 import com.fyxridd.lib.core.api.plugin.SimplePlugin;
+import com.fyxridd.lib.msg.config.LangConfig;
 import com.fyxridd.lib.msg.config.MsgConfig;
+import com.fyxridd.lib.msg.config.ScoreboardConfig;
 import com.fyxridd.lib.msg.manager.InfoManager;
 import com.fyxridd.lib.msg.manager.MsgManager;
 import com.fyxridd.lib.msg.manager.OuterManager;
@@ -26,6 +28,8 @@ public class MsgPlugin extends SimplePlugin{
         }
 
         //注册配置
+        ConfigApi.register(pn, LangConfig.class);
+        ConfigApi.register(pn, ScoreboardConfig.class);
         ConfigApi.register(pn, MsgConfig.class);
         
         msgManager = new MsgManager();

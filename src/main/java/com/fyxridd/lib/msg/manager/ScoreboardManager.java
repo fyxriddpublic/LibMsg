@@ -15,10 +15,11 @@ import com.fyxridd.lib.core.api.config.Setter;
 import com.fyxridd.lib.core.realname.NotReadyException;
 import com.fyxridd.lib.msg.MsgPlugin;
 import com.fyxridd.lib.msg.api.SideGetter;
-import com.fyxridd.lib.msg.config.MsgConfig;
+import com.fyxridd.lib.msg.config.ScoreboardConfig;
 import com.fyxridd.lib.msg.model.MsgInfo;
 import com.fyxridd.lib.msg.model.SideConfig;
 import com.fyxridd.lib.msg.model.SideInfo;
+
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.*;
@@ -29,13 +30,16 @@ import org.bukkit.plugin.EventExecutor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
+/**
+ * 负责与底层包交互
+ */
 public class ScoreboardManager {
     private static final String colors = "abcdef0123456789";
     //没有这权限:显示侧边栏 有这权限:不显示侧边栏
     private static final String CHECK_PER = "lib.msg.checkShow";
     private static ProtocolManager protocolManager = ProtocolLibrary.getProtocolManager();
 
-    private MsgConfig config;
+    private ScoreboardConfig scoreboardConfig;
 
     //缓存
 
@@ -51,10 +55,10 @@ public class ScoreboardManager {
 
     public ScoreboardManager() {
         //添加配置监听
-        ConfigApi.addListener(MsgPlugin.instance.pn, MsgConfig.class, new Setter<MsgConfig>() {
+        ConfigApi.addListener(MsgPlugin.instance.pn, ScoreboardConfig.class, new Setter<ScoreboardConfig>() {
             @Override
-            public void set(MsgConfig value) {
-                config = value;
+            public void set(ScoreboardConfig value) {
+                scoreboardConfig = value;
             }
         });
         //注册事件
@@ -233,7 +237,7 @@ public class ScoreboardManager {
     public void setSideShowItem(Player p, int index, String show) {
         if (p == null || !p.isOnline()) return;
 
-        if (index < 0 || index >= config.getSideSize()) return;
+        if (index < 0 || index >= scoreboardConfig.getSideSize()) return;
 
         if (show == null) show = "";
         else if (show.length() > 14) show = show.substring(0, 14);
@@ -263,7 +267,7 @@ public class ScoreboardManager {
     public void updateSideShow(Player p, String name) {
         SideGetter sideGetter = sideGetters.get(name);
         if (sideGetter != null) {
-            for (Map.Entry<Integer, SideConfig> entry:config.getSides().entrySet()) {
+            for (Map.Entry<Integer, SideConfig> entry:scoreboardConfig.getSides().entrySet()) {
                 if (entry.getValue().getName().equals(name)) {
                     String content = sideGetter.get(p, entry.getValue().getData());
                     if (entry.getKey() == -1) setSideShowTitle(p, content);
@@ -459,7 +463,7 @@ public class ScoreboardManager {
         SideInfo sideInfo = shows.get(name);
         if (sideInfo == null) {
             List<String> froms = new ArrayList<>();
-            for (int i=0;i<config.getSideSize();i++) froms.add("");
+            for (int i=0;i<scoreboardConfig.getSideSize();i++) froms.add("");
 
             sideInfo = new SideInfo("", froms);
             shows.put(name, sideInfo);

@@ -2,7 +2,6 @@ package com.fyxridd.lib.msg.manager;
 
 import com.fyxridd.lib.msg.MsgPlugin;
 import com.fyxridd.lib.msg.api.MsgApi;
-import com.fyxridd.lib.msg.api.params.PlayerInfo;
 import com.fyxridd.lib.msg.model.LevelData;
 import com.fyxridd.lib.params.api.Getter;
 import com.fyxridd.lib.params.api.ParamsApi;
@@ -14,6 +13,46 @@ import com.fyxridd.lib.show.chat.api.show.ShowListGetter;
  * 对外暴露的内容
  */
 public class OuterManager {
+    public class PlayerInfo {
+        /**
+         * @return 不为null可为""
+         */
+        private String prefixType;
+        /**
+         * @return 不为null可为""
+         */
+        private String suffixType;
+
+        /**
+         * @return 不为null可为""
+         */
+        private String prefix;
+        /**
+         * @return 不为null可为""
+         */
+        private String suffix;
+        public PlayerInfo(String prefixType, String suffixType, String prefix, String suffix) {
+            super();
+            this.prefixType = prefixType != null?prefixType:"";
+            this.suffixType = suffixType != null?suffixType:"";
+            this.prefix = prefix != null?prefix:"";
+            this.suffix = suffix != null?suffix:"";
+        }
+        public String getPrefixType() {
+            return prefixType;
+        }
+        public String getSuffixType() {
+            return suffixType;
+        }
+        public String getPrefix() {
+            return prefix;
+        }
+        public String getSuffix() {
+            return suffix;
+        }
+    }
+
+    
     public static final String GET_PLAYER_INFO = "getPlayerInfo";
     public static final String GET_ALL_PREFIX = "getPrefixes";
     public static final String GET_ALL_SUFFIX = "getSuffixes";
@@ -35,6 +74,7 @@ public class OuterManager {
             }
         });
 
+        //注册列表获取器
         ShowApi.register(MsgPlugin.instance.pn, GET_ALL_PREFIX, new ShowListGetter() {
             @Override
             public ShowList handle(String name, String arg) {

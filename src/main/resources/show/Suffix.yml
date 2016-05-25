@@ -4,11 +4,11 @@
   getStrings:
     a_suffixType: "o1:getSuffixType()"
 
-pageMax: 1
-
-listSize: 8
-
-refresh: true
+list:
+  plugin: "LibMsg"
+  key: "getSuffixes"
+  arg: ""
+  size: 8
 
 page-1: "5 10 20 30 40 50 -2"
 
@@ -17,94 +17,150 @@ show-5: "&7======================[&a后缀列表&7]====================="
 show-10: "          <0><1>            <2><3>"
 info-10:
   0:
-    con: "{getSize} > 0"
+    con:
+      exp: "m1"
+      params:
+        m1: "{getSize} > 0"
     text: '{0.level}'
     color: "f"
     onClick: "cmd /f mg d {0.type}"
     onHover: "&7点击选择显示"
   1:
-    con: "{getSize} > 0 && y'{0.type}'=='{type}'"
+    con:
+      exp: "m1 && s1"
+      params:
+        m1: "{getSize} > 0"
+        s1: "y'{0.type}'=='{a_suffixType}'"
     text: "(当前显示)"
     color: "a"
   2:
-    con: "{getSize} > 1"
+    con:
+      exp: "m1"
+      params:
+        m1: "{getSize} > 1"
     text: '{1.level}'
     color: "f"
     onClick: "cmd /f mg d {1.type}"
     onHover: "&7点击选择显示"
   3:
-    con: "{getSize} > 1 && y'{1.type}'=='{type}'"
+    con:
+      exp: "m1 && s1"
+      params:
+        m1: "{getSize} > 1"
+        s1: "y'{1.type}'=='{a_suffixType}'"
     text: "(当前显示)"
     color: "a"
 
 show-20: "                     <0><1>"
 info-20:
   0:
-    con: "{getSize} > 2"
+    con:
+      exp: "m1"
+      params:
+        m1: "{getSize} > 2"
     text: '{2.level}'
     color: "f"
     onClick: "cmd /f mg d {2.type}"
     onHover: "&7点击选择显示"
   1:
-    con: "{getSize} > 2 && y'{2.type}'=='{type}'"
+    con:
+      exp: "m1 && s1"
+      params:
+        m1: "{getSize} > 2"
+        s1: "y'{2.type}'=='{a_suffixType}'"
     text: "(当前显示)"
     color: "a"
 
 show-30: "          <0><1>            <2><3>"
 info-30:
   0:
-    con: "{getSize} > 3"
+    con:
+      exp: "m1"
+      params:
+        m1: "{getSize} > 3"
     text: '{3.level}'
     color: "f"
     onClick: "cmd /f mg d {3.type}"
     onHover: "&7点击选择显示"
   1:
-    con: "{getSize} > 3 && y'{3.type}'=='{type}'"
+    con:
+      exp: "m1 && s1"
+      params:
+        m1: "{getSize} > 3"
+        s1: "y'{3.type}'=='{a_suffixType}'"
     text: "(当前显示)"
     color: "a"
   2:
-    con: "{getSize} > 4"
+    con:
+      exp: "m1"
+      params:
+        m1: "{getSize} > 4"
     text: '{4.level}'
     color: "f"
     onClick: "cmd /f mg d {4.type}"
     onHover: "&7点击选择显示"
   3:
-    con: "{getSize} > 4 && y'{4.type}'=='{type}'"
+    con:
+      exp: "m1 && s1"
+      params:
+        m1: "{getSize} > 4"
+        s1: "y'{4.type}'=='{a_suffixType}'"
     text: "(当前显示)"
     color: "a"
 
 show-40: "                     <0><1>"
 info-40:
   0:
-    con: "{getSize} > 5"
+    con:
+      exp: "m1"
+      params:
+        m1: "{getSize} > 5"
     text: '{5.level}'
     color: "f"
     onClick: "cmd /f mg d {5.type}"
     onHover: "&7点击选择显示"
   1:
-    con: "{getSize} > 5 && y'{5.type}'=='{type}'"
+    con:
+      exp: "m1 && s1"
+      params:
+        m1: "{getSize} > 5"
+        s1: "y'{5.type}'=='{a_suffixType}'"
     text: "(当前显示)"
     color: "a"
 
 show-50: "          <0><1>            <2><3>"
 info-50:
   0:
-    con: "{getSize} > 6"
+    con:
+      exp: "m1"
+      params:
+        m1: "{getSize} > 6"
     text: '{6.level}'
     color: "f"
     onClick: "cmd /f mg d {6.type}"
     onHover: "&7点击选择显示"
   1:
-    con: "{getSize} > 6 && y'{6.type}'=='{type}'"
+    con:
+      exp: "m1 && s1"
+      params:
+        m1: "{getSize} > 6"
+        s1: "y'{6.type}'=='{a_suffixType}'"
     text: "(当前显示)"
     color: "a"
   2:
-    con: "{getSize} > 7"
+    con:
+      exp: "m1"
+      params:
+        m1: "{getSize} > 7"
     text: '{7.level}'
     color: "f"
     onClick: "cmd /f mg d {7.type}"
     onHover: "&7点击选择显示"
   3:
-    con: "{getSize} > 7 && y'{7.type}'=='{type}'"
+    con:
+      exp: "m1 && s1"
+      params:
+        m1: "{getSize} > 7"
+        s1: "y'{7.type}'=='{a_suffixType}'"
     text: "(当前显示)"
     color: "a"

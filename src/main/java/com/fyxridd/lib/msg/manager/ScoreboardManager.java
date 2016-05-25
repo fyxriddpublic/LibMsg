@@ -8,28 +8,26 @@ import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.wrappers.EnumWrappers;
-import com.fyxridd.lib.core.api.CoreApi;
 import com.fyxridd.lib.core.api.PerApi;
 import com.fyxridd.lib.core.api.PlayerApi;
-import com.fyxridd.lib.core.api.event.ReloadConfigEvent;
 import com.fyxridd.lib.core.realname.NotReadyException;
 import com.fyxridd.lib.msg.api.SideHandler;
 import com.fyxridd.lib.msg.config.MsgConfig;
 import com.fyxridd.lib.msg.model.MsgInfo;
 import com.fyxridd.lib.msg.model.SideConfig;
 import com.fyxridd.lib.msg.model.SideInfo;
-
 import org.bukkit.Bukkit;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ScoreboardManager {
     private static final String colors = "abcdef0123456789";
@@ -166,14 +164,14 @@ public class ScoreboardManager {
 
         if (display) {
             if (!isDisplaySideBar(p)) {
-                PerApi.del(p, CHECK_PER);
+                PerApi.del(p.getName(), CHECK_PER);
                 SideInfo sideInfo = getShowInfo(p.getName());
                 List<PacketContainer> list = getCreateSidePackets(p.getName(), sideInfo.getShow(), sideInfo.getFrom());
                 for (PacketContainer pc:list) send(p, pc);
             }
         }else {
             if (isDisplaySideBar(p)) {
-                PerApi.add(p, CHECK_PER);
+                PerApi.add(p.getName(), CHECK_PER);
                 PacketContainer removeSidePacket = getRemoveSidePacket(p.getName());
                 send(p, removeSidePacket);
             }

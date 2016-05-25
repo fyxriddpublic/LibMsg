@@ -1,10 +1,8 @@
 package com.fyxridd.lib.msg.func;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.fyxridd.lib.core.api.MessageApi;
 import com.fyxridd.lib.core.api.fancymessage.FancyMessage;
+import com.fyxridd.lib.msg.model.LevelData;
 import com.fyxridd.lib.speed.api.SpeedApi;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -85,10 +83,10 @@ public class MsgChat implements Refresh{
             return;
         }
         //选择显示成功
-        ScoreboardManager.msgManager.setLevel(p.getName(), type, level, isPrefix, true);
+        MsgPlugin.instance.getMsgManager().setLevel(p.getName(), type, level, isPrefix, true);
         //提示
-        if (isPrefix) MessageApi.send(p, get(50, level), true);
-        else MessageApi.send(p, get(55, level), true);
+        if (isPrefix) MessageApi.send(p, get(p.getName(), 50, level), true);
+        else MessageApi.send(p, get(p.getName(), 55, level), true);
     }
 
     @Func("cancel")
@@ -96,22 +94,15 @@ public class MsgChat implements Refresh{
         //检测权限
         if (!checkPer(p, prefix)) return;
         //速度检测
-        if (!SpeedApi.checkShort(p, MsgPlugin.pn, SHORT_SEL, 3)) return;
+        if (!SpeedApi.checkShort(p, MsgPlugin.instance.pn, SHORT_SEL, 3)) return;
         //取消显示成功
-        ScoreboardManager.msgManager.setLevel(p.getName(), null, null, prefix, true);
+        MsgPlugin.instance.getMsgManager().setLevel(p.getName(), null, null, prefix, true);
         //提示
-        if (prefix) MessageApi.send(p, get(60), true);
-        else MessageApi.send(p, get(65), true);
+        if (prefix) MessageApi.send(p, get(p.getName(), 60), true);
+        else MessageApi.send(p, get(p.getName(), 65), true);
     }
 
     public void showMain(Player p, PlayerContext pc) {
-        //map
-        Map<String, Object> map = new HashMap<>();
-        String prefix = MsgApi.getPrefix(p.getName());
-        String suffix = MsgApi.getSuffix(p.getName());
-        map.put("prefix", prefix == null?"":prefix);
-        map.put("suffix", suffix == null?"":suffix);
-        //显示
         if (pc != null) ShowApi.show(this, "main", p, MsgPlugin.instance.pn, PAGE_MAIN, null, pc.getPageNow(), pc.getListNow(), null, null);
         else ShowApi.show(this, "main", p, MsgPlugin.instance.pn, PAGE_MAIN, null, 1, 1, null, null);
     }
@@ -119,10 +110,6 @@ public class MsgChat implements Refresh{
     private void showPrefix(Player p, PlayerContext pc) {
         //list
         ShowList showList = ShowApi.getShowList(2, MsgPlugin.instance.getMsgManager().getPrefixs(p.getName()), LevelData.class);
-        //map
-        HashMap<String, Object> map = new HashMap<>();
-        String type = ScoreboardManager.msgManager.getNowType(p.getName(), true);
-        map.put("type", type != null?type:"");
         //显示
         if (pc != null) ShowApi.show(this, "prefix", p, MsgPlugin.instance.pn, PAGE_PREFIX, showList, pc.getPageNow(), pc.getListNow(), null, null);
         else ShowApi.show(this, "prefix", p, MsgPlugin.instance.pn, PAGE_PREFIX, showList, 1, 1, null, null);
@@ -131,13 +118,9 @@ public class MsgChat implements Refresh{
     private void showSuffix(Player p, PlayerContext pc) {
         //list
         ShowList showList = ShowApi.getShowList(2, MsgPlugin.instance.getMsgManager().getSuffixs(p.getName()), LevelData.class);
-        //map
-        HashMap<String, Object> map = new HashMap<>();
-        String type = ScoreboardManager.msgManager.getNowType(p.getName(), false);
-        map.put("type", type != null?type:"");
         //显示
-        if (pc != null) ShowApi.show(this, "suffix", p, MsgPlugin.instance.pn, PAGE_SUFFIX, showList, map, pc.getPageNow(), pc.getListNow(), null, null);
-        else ShowApi.show(this, "suffix", p, MsgPlugin.instance.pn, PAGE_SUFFIX, showList, map, 1, 1, null, null);
+        if (pc != null) ShowApi.show(this, "suffix", p, MsgPlugin.instance.pn, PAGE_SUFFIX, showList, pc.getPageNow(), pc.getListNow(), null, null);
+        else ShowApi.show(this, "suffix", p, MsgPlugin.instance.pn, PAGE_SUFFIX, showList, 1, 1, null, null);
     }
 
     @Override
@@ -166,9 +149,9 @@ public class MsgChat implements Refresh{
      */
     private boolean checkPer(Player p, boolean prefix) {
         if (prefix) {
-            if (!PerApi.checkPer(p.getName(), config.getPrefixPer())) return false;
+            if (!PerApi.checkHasPer(p.getName(), config.getPrefixPer())) return false;
         }else {
-            if (!PerApi.checkPer(p.getName(), config.getSuffixPer())) return false;
+            if (!PerApi.checkHasPer(p.getName(), config.getSuffixPer())) return false;
         }
         return true;
     }

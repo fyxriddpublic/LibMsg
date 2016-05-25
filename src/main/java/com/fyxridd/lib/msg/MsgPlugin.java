@@ -43,4 +43,8 @@ public class MsgPlugin extends SimplePlugin{
     public ScoreboardManager getScoreboardManager() {
         return scoreboardManager;
     }
+
+    public InfoManager getInfoManager() {
+        return infoManager;
+    }
 }

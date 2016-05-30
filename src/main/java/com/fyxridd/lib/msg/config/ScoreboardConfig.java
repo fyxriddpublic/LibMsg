@@ -15,7 +15,7 @@ import com.fyxridd.lib.msg.model.SideConfig;
 
 @Path("scoreboard")
 public class ScoreboardConfig {
-    private class SidesConverter implements ListConverter<Map<Integer, SideConfig>> {
+    private static class SidesConverter implements ListConverter<Map<Integer, SideConfig>> {
         @Override
         public Map<Integer, SideConfig> convert(String plugin, List list) {
             Map<Integer, SideConfig> sides = new HashMap<>();

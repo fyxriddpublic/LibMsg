@@ -23,7 +23,7 @@ public class InfoManager {
 
     public InfoManager() {
         //注册获取器
-        MsgApi.registerSideHandler(HANDLER_NAME, new SideGetter() {
+        MsgApi.registerSideGetter(HANDLER_NAME, new SideGetter() {
             /**
              * data会转换颜色字符,可用变量:
              *   {name}: 玩家名

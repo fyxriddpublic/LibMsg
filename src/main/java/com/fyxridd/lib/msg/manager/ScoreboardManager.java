@@ -12,7 +12,7 @@ import com.fyxridd.lib.core.api.PerApi;
 import com.fyxridd.lib.core.api.PlayerApi;
 import com.fyxridd.lib.core.api.config.ConfigApi;
 import com.fyxridd.lib.core.api.config.Setter;
-import com.fyxridd.lib.core.realname.NotReadyException;
+import com.fyxridd.lib.core.api.exception.NotReadyException;
 import com.fyxridd.lib.msg.MsgPlugin;
 import com.fyxridd.lib.msg.api.SideGetter;
 import com.fyxridd.lib.msg.config.ScoreboardConfig;
@@ -255,7 +255,7 @@ public class ScoreboardManager {
     }
 
     /**
-     * @see com.fyxridd.lib.msg.api.MsgApi#registerSideHandler(String, SideGetter)
+     * @see com.fyxridd.lib.msg.api.MsgApi#registerSideGetter(String, SideGetter)
      */
     public void registerSideHandler(String name, SideGetter sideGetter) {
         sideGetters.put(name, sideGetter);

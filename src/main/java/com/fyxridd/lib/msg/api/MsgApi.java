@@ -85,7 +85,7 @@ public class MsgApi {
      * @param name 获取器名,唯一
      * @param sideGetter 值获取器
      */
-    public static void registerSideHandler(String name, SideGetter sideGetter) {
+    public static void registerSideGetter(String name, SideGetter sideGetter) {
         MsgPlugin.instance.getScoreboardManager().registerSideHandler(name, sideGetter);
     }
 

@@ -40,8 +40,10 @@ public class InfoManager {
         Bukkit.getPluginManager().registerEvent(PlayerJoinEvent.class, MsgPlugin.instance, EventPriority.HIGHEST, new EventExecutor() {
             @Override
             public void execute(Listener listener, Event e) throws EventException {
-                PlayerJoinEvent event = (PlayerJoinEvent) e;
-                MsgApi.updateSideShow(event.getPlayer(), HANDLER_NAME);
+                if (e instanceof PlayerJoinEvent) {
+                    PlayerJoinEvent event = (PlayerJoinEvent) e;
+                    MsgApi.updateSideShow(event.getPlayer(), HANDLER_NAME);
+                }
             }
         }, MsgPlugin.instance);
     }

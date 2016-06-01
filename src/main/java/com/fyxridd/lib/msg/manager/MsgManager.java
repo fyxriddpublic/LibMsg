@@ -61,47 +61,51 @@ public class MsgManager {
             Bukkit.getPluginManager().registerEvent(PlayerJoinEvent.class, MsgPlugin.instance, EventPriority.LOWEST, new EventExecutor() {
                 @Override
                 public void execute(Listener listener, Event e) throws EventException {
-                    PlayerJoinEvent event = (PlayerJoinEvent) e;
-                    if (!prefixLevels.containsKey(event.getPlayer().getName())) prefixLevels.put(event.getPlayer().getName(), new HashMap<String, LevelData>());
-                    if (!suffixLevels.containsKey(event.getPlayer().getName())) suffixLevels.put(event.getPlayer().getName(), new HashMap<String, LevelData>());
+                    if (e instanceof PlayerJoinEvent) {
+                        PlayerJoinEvent event = (PlayerJoinEvent) e;
+                        if (!prefixLevels.containsKey(event.getPlayer().getName())) prefixLevels.put(event.getPlayer().getName(), new HashMap<String, LevelData>());
+                        if (!suffixLevels.containsKey(event.getPlayer().getName())) suffixLevels.put(event.getPlayer().getName(), new HashMap<String, LevelData>());
+                    }
                 }
             }, MsgPlugin.instance);
             Bukkit.getPluginManager().registerEvent(PlayerJoinEvent.class, MsgPlugin.instance, EventPriority.MONITOR, new EventExecutor() {
                 @Override
                 public void execute(Listener listener, Event e) throws EventException {
-                    PlayerJoinEvent event = (PlayerJoinEvent) e;
-                    String name = event.getPlayer().getName();
-                    enableAutos.add(name);
-                    //前缀
-                    {
-                        Map<String, LevelData> datas = prefixLevels.get(name);
-                        if (datas != null) {
-                            //检测先前显示的
-                            LevelData levelData = datas.get(InfoApi.getInfo(name, PRE_SHOW_PREFIX));
-                            if (levelData != null && isPrefix(levelData.getType())) {
-                                setLevel(name, levelData.getType(), levelData.getLevel(), true, true);
-                            }else {
-                                //删除当前显示
-                                setLevel(name, null, null, true, true);
-                                //检测自动选择一个
-                                checkAutoSel(name, true);
+                    if (e instanceof PlayerJoinEvent) {
+                        PlayerJoinEvent event = (PlayerJoinEvent) e;
+                        String name = event.getPlayer().getName();
+                        enableAutos.add(name);
+                        //前缀
+                        {
+                            Map<String, LevelData> datas = prefixLevels.get(name);
+                            if (datas != null) {
+                                //检测先前显示的
+                                LevelData levelData = datas.get(InfoApi.getInfo(name, PRE_SHOW_PREFIX));
+                                if (levelData != null && isPrefix(levelData.getType())) {
+                                    setLevel(name, levelData.getType(), levelData.getLevel(), true, true);
+                                }else {
+                                    //删除当前显示
+                                    setLevel(name, null, null, true, true);
+                                    //检测自动选择一个
+                                    checkAutoSel(name, true);
+                                }
                             }
                         }
-                    }
 
-                    //后缀
-                    {
-                        Map<String, LevelData> datas = suffixLevels.get(name);
-                        if (datas != null) {
-                            //检测先前显示的
-                            LevelData levelData = datas.get(InfoApi.getInfo(name, PRE_SHOW_SUFFIX));
-                            if (levelData != null && !isPrefix(levelData.getType())) {
-                                setLevel(name, levelData.getType(), levelData.getLevel(), false, true);
-                            }else {
-                                //删除当前显示
-                                setLevel(name, null, null, false, true);
-                                //检测自动选择一个
-                                checkAutoSel(name, false);
+                        //后缀
+                        {
+                            Map<String, LevelData> datas = suffixLevels.get(name);
+                            if (datas != null) {
+                                //检测先前显示的
+                                LevelData levelData = datas.get(InfoApi.getInfo(name, PRE_SHOW_SUFFIX));
+                                if (levelData != null && !isPrefix(levelData.getType())) {
+                                    setLevel(name, levelData.getType(), levelData.getLevel(), false, true);
+                                }else {
+                                    //删除当前显示
+                                    setLevel(name, null, null, false, true);
+                                    //检测自动选择一个
+                                    checkAutoSel(name, false);
+                                }
                             }
                         }
                     }
@@ -111,8 +115,10 @@ public class MsgManager {
             Bukkit.getPluginManager().registerEvent(PlayerQuitEvent.class, MsgPlugin.instance, EventPriority.NORMAL, new EventExecutor() {
                 @Override
                 public void execute(Listener listener, Event e) throws EventException {
-                    PlayerQuitEvent event = (PlayerQuitEvent) e;
-                    enableAutos.remove(event.getPlayer().getName());
+                    if (e instanceof PlayerQuitEvent) {
+                        PlayerQuitEvent event = (PlayerQuitEvent) e;
+                        enableAutos.remove(event.getPlayer().getName());
+                    }
                 }
             }, MsgPlugin.instance);
         }

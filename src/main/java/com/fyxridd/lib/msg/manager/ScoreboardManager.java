@@ -12,7 +12,6 @@ import com.fyxridd.lib.core.api.PerApi;
 import com.fyxridd.lib.core.api.PlayerApi;
 import com.fyxridd.lib.core.api.config.ConfigApi;
 import com.fyxridd.lib.core.api.config.Setter;
-import com.fyxridd.lib.core.api.exception.NotReadyException;
 import com.fyxridd.lib.msg.MsgPlugin;
 import com.fyxridd.lib.msg.api.SideGetter;
 import com.fyxridd.lib.msg.config.ScoreboardConfig;
@@ -67,30 +66,32 @@ public class ScoreboardManager {
             Bukkit.getPluginManager().registerEvent(PlayerJoinEvent.class, MsgPlugin.instance, EventPriority.LOWEST, new EventExecutor() {
                 @Override
                 public void execute(Listener listener, Event e) throws EventException {
-                    PlayerJoinEvent event = (PlayerJoinEvent) e;
-                    Player p = event.getPlayer();
-                    String name = p.getName();
-                    if (!players.containsKey(name)) {
-                        List<String> list = new ArrayList<String>();
-                        list.add(name);
-                        players.put(name, list);
-                    }
+                    if (e instanceof PlayerJoinEvent) {
+                        PlayerJoinEvent event = (PlayerJoinEvent) e;
+                        Player p = event.getPlayer();
+                        String name = p.getName();
+                        if (!players.containsKey(name)) {
+                            List<String> list = new ArrayList<String>();
+                            list.add(name);
+                            players.put(name, list);
+                        }
 
-                    MsgInfo msgInfo0 = getMsgInfo(p.getName());
-                    List<String> list0 = players.get(name);
-                    PacketContainer createTeamPacketSelf = getCreateTeamPacket(name, msgInfo0.getPrefix(), msgInfo0.getSuffix(), list0);;
-                    for (Player tar:Bukkit.getOnlinePlayers()) {
-                        if (!tar.equals(p)) send(tar, createTeamPacketSelf);
+                        MsgInfo msgInfo0 = getMsgInfo(p.getName());
+                        List<String> list0 = players.get(name);
+                        PacketContainer createTeamPacketSelf = getCreateTeamPacket(name, msgInfo0.getPrefix(), msgInfo0.getSuffix(), list0);;
+                        for (Player tar:Bukkit.getOnlinePlayers()) {
+                            if (!tar.equals(p)) send(tar, createTeamPacketSelf);
 
-                        MsgInfo msgInfo = getMsgInfo(tar.getName());
-                        PacketContainer createTeamPacketOther = getCreateTeamPacket(tar.getName(), msgInfo.getPrefix(), msgInfo.getSuffix(), players.get(tar.getName()));
-                        send(p, createTeamPacketOther);
-                    }
-                    //侧边栏检测
-                    if (isDisplaySideBar(p)) {
-                        SideInfo sideInfo = getShowInfo(name);
-                        List<PacketContainer> createSidePackets = getCreateSidePackets(name, sideInfo.getShow(), sideInfo.getFrom());
-                        for (PacketContainer pc : createSidePackets) send(p, pc);
+                            MsgInfo msgInfo = getMsgInfo(tar.getName());
+                            PacketContainer createTeamPacketOther = getCreateTeamPacket(tar.getName(), msgInfo.getPrefix(), msgInfo.getSuffix(), players.get(tar.getName()));
+                            send(p, createTeamPacketOther);
+                        }
+                        //侧边栏检测
+                        if (isDisplaySideBar(p)) {
+                            SideInfo sideInfo = getShowInfo(name);
+                            List<PacketContainer> createSidePackets = getCreateSidePackets(name, sideInfo.getShow(), sideInfo.getFrom());
+                            for (PacketContainer pc : createSidePackets) send(p, pc);
+                        }
                     }
                 }
             }, MsgPlugin.instance);
@@ -98,11 +99,13 @@ public class ScoreboardManager {
             Bukkit.getPluginManager().registerEvent(PlayerQuitEvent.class, MsgPlugin.instance, EventPriority.LOWEST, new EventExecutor() {
                 @Override
                 public void execute(Listener listener, Event e) throws EventException {
-                    PlayerQuitEvent event = (PlayerQuitEvent) e;
-                    Player p = event.getPlayer();
-                    PacketContainer pc = getRemoveTeamPacket(p.getName());
-                    for (Player tar:Bukkit.getOnlinePlayers()) {
-                        if (!tar.getName().equals(p.getName())) send(tar, pc);
+                    if (e instanceof PlayerQuitEvent) {
+                        PlayerQuitEvent event = (PlayerQuitEvent) e;
+                        Player p = event.getPlayer();
+                        PacketContainer pc = getRemoveTeamPacket(p.getName());
+                        for (Player tar:Bukkit.getOnlinePlayers()) {
+                            if (!tar.getName().equals(p.getName())) send(tar, pc);
+                        }
                     }
                 }
             }, MsgPlugin.instance);
@@ -132,11 +135,7 @@ public class ScoreboardManager {
         if (name == null) return null;
 
         //玩家存在性检测
-        try {
-            name = PlayerApi.getRealName(null, name);
-        } catch (NotReadyException e) {
-            return null;
-        }
+        name = PlayerApi.getRealName(null, name);
         if (name == null) return null;
         //
         return getMsgInfo(name).getPrefix();
@@ -165,11 +164,7 @@ public class ScoreboardManager {
         if (name == null) return null;
 
         //玩家存在性检测
-        try {
-            name = PlayerApi.getRealName(null, name);
-        } catch (NotReadyException e) {
-            return null;
-        }
+        name = PlayerApi.getRealName(null, name);
         if (name == null) return null;
         //
         return getMsgInfo(name).getSuffix();
